@@ -54,9 +54,9 @@ export const LETTERS: LetterRule[] = [
 ]
 
 export const SPECIAL_RULES: string[] = [
-  "Ъ = ##, Ь = '' (type the sign twice for the capital letter).",
-  'Type + to separate letters that would otherwise combine: j+o → йо, j+e → йе, s+h → сх.',
-  'Esc, F12 or Ctrl+Space switches between Cyrillic and Latin input.'
+  "Ъ = ##, Ь = '' (знак, набранный дважды, даёт заглавную букву).",
+  'Знак + разделяет буквы, которые иначе объединились бы: j+o → йо, j+e → йе, s+h → сх.',
+  'Esc, F12 или Ctrl+Space переключают ввод между кириллицей и латиницей.'
 ]
 
 /** Separator: "й+a" becomes "йа" instead of "я". */

@@ -6,6 +6,15 @@ import { useSpellChecker } from './spell/useSpellChecker'
 
 const TEXT_KEY = 'translit.text'
 
+/** Russian plural form: plural(5, ['слово', 'слова', 'слов']) → 'слов'. */
+function plural(n: number, [one, few, many]: [string, string, string]): string {
+  const mod10 = n % 10
+  const mod100 = n % 100
+  if (mod10 === 1 && mod100 !== 11) return one
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few
+  return many
+}
+
 function loadText(): string {
   try {
     return localStorage.getItem(TEXT_KEY) || ''
@@ -65,30 +74,30 @@ export function App() {
 
   const spellStatus =
     spell.status === 'loading'
-      ? 'Loading Russian dictionary…'
+      ? 'Загрузка русского словаря…'
       : spell.status === 'error'
-      ? `Spell checker unavailable: ${spell.error}`
+      ? `Проверка орфографии недоступна: ${spell.error}`
       : spell.misspelled.length === 0
-      ? 'No spelling errors'
-      : `${spell.misspelled.length} possible spelling error${spell.misspelled.length === 1 ? '' : 's'}. Click an underlined word for suggestions.`
+      ? 'Орфографических ошибок нет'
+      : `Возможные ошибки: ${spell.misspelled.length}. Нажмите на подчёркнутое слово, чтобы увидеть варианты.`
 
   return (
     <div className="app">
       <header>
-        <h1>Russian transliteration</h1>
+        <h1>Русская транслитерация</h1>
         <div className="toolbar">
           <button
             className={translit ? 'toggle on' : 'toggle'}
             aria-pressed={translit}
             onClick={() => setTranslit((t) => !t)}
-            title="Esc, F12 or Ctrl+Space"
+            title="Esc, F12 или Ctrl+Space"
           >
-            {translit ? 'Кириллица ON' : 'Latin (translit OFF)'}
+            {translit ? 'Ввод: кириллица' : 'Ввод: латиница'}
           </button>
-          <button onMouseDown={(e) => e.preventDefault()} onClick={convertSelection} title="Transliterate selected Latin text">
-            Convert selection
+          <button onMouseDown={(e) => e.preventDefault()} onClick={convertSelection} title="Транслитерировать выделенный латинский текст">
+            Преобразовать выделенное
           </button>
-          <button onClick={copy}>{copied ? 'Copied' : 'Copy text'}</button>
+          <button onClick={copy}>{copied ? 'Скопировано' : 'Копировать текст'}</button>
         </div>
       </header>
 
@@ -107,16 +116,15 @@ export function App() {
         <div className="status" role="status">
           <span className={`spell-${spell.status}`}>{spellStatus}</span>
           <span>
-            {spell.wordCount} word{spell.wordCount === 1 ? '' : 's'} · Esc toggles transliteration
+            {spell.wordCount} {plural(spell.wordCount, ['слово', 'слова', 'слов'])} · Esc — кириллица/латиница
           </span>
         </div>
       </main>
 
       <footer>
-        Runs entirely in your browser. No data leaves this page. Spell checking by{' '}
-        <a href="https://github.com/wooorm/nspell" rel="noreferrer">nspell</a> with the{' '}
-        <a href="https://github.com/wooorm/dictionaries/tree/main/dictionaries/ru" rel="noreferrer">dictionary-ru</a>{' '}
-        Hunspell dictionary.
+        Страница работает полностью в браузере, данные никуда не передаются. Проверка орфографии:{' '}
+        <a href="https://github.com/wooorm/nspell" rel="noreferrer">nspell</a> со словарём Hunspell{' '}
+        <a href="https://github.com/wooorm/dictionaries/tree/main/dictionaries/ru" rel="noreferrer">dictionary-ru</a>.
       </footer>
     </div>
   )

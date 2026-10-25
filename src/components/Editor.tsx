@@ -130,8 +130,8 @@ export const Editor = forwardRef<EditorHandle, Props>(function Editor(
         onBlur={closePopover}
         spellCheck={false}
         autoFocus
-        aria-label="Text editor. Latin letters are converted to Cyrillic as you type."
-        placeholder="Type here with the English keyboard: privet, mir → привет, мир"
+        aria-label="Текстовый редактор. Латинские буквы при наборе заменяются кириллицей."
+        placeholder="Печатайте в английской раскладке: privet, mir → привет, мир"
       />
       {popover && (
         <SuggestionPopover

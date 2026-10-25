@@ -10,7 +10,7 @@ const post = (msg: FromWorker) => (self as unknown as Worker).postMessage(msg)
 
 async function fetchText(url: string): Promise<string> {
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`could not load ${url} (${res.status})`)
+  if (!res.ok) throw new Error(`не удалось загрузить ${url} (${res.status})`)
   return res.text()
 }
 

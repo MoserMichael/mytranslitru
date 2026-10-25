@@ -35,8 +35,8 @@ export function SuggestionPopover({ word, top, left, suggest, onPick, onAdd, onC
 
   return (
     <div className="popover" style={{ top, left }} role="menu" onMouseDown={(e) => e.preventDefault()}>
-      {list === null && <div className="popover-info">Looking for suggestions…</div>}
-      {list?.length === 0 && <div className="popover-info">No suggestions</div>}
+      {list === null && <div className="popover-info">Поиск вариантов…</div>}
+      {list?.length === 0 && <div className="popover-info">Нет вариантов</div>}
       {list?.map((s) => (
         <button key={s} role="menuitem" onClick={() => onPick(s)}>
           {s}
@@ -44,7 +44,7 @@ export function SuggestionPopover({ word, top, left, suggest, onPick, onAdd, onC
       ))}
       <hr />
       <button role="menuitem" onClick={onAdd}>
-        Add “{word}” to dictionary
+        Добавить «{word}» в словарь
       </button>
     </div>
   )

@@ -18,7 +18,7 @@ export function RulesTable({ onInsert }: Props) {
   const keepFocus = (e: MouseEvent) => e.preventDefault()
 
   return (
-    <section className="rules" aria-label="Transliteration rules">
+    <section className="rules" aria-label="Правила транслитерации">
       <ul className="letters">
         <li className="letter shift-cell">
           <button className={shift ? 'shift on' : 'shift'} aria-pressed={shift} onMouseDown={keepFocus} onClick={() => setShift((s) => !s)}>
@@ -33,7 +33,7 @@ export function RulesTable({ onInsert }: Props) {
               className="cyr"
               onMouseDown={keepFocus}
               onClick={(e) => onInsert(shift !== e.shiftKey ? l.upper : l.lower)}
-              title={`Insert ${l.upper} / ${l.lower}`}
+              title={`Вставить ${l.upper} / ${l.lower}`}
             >
               {shift ? l.upper : l.lower}
             </button>
@@ -46,7 +46,7 @@ export function RulesTable({ onInsert }: Props) {
         ))}
       </ul>
       <p className="source">
-        Transliteration rules as on <a href="https://translit.net/" rel="noreferrer">translit.net</a>.
+        Правила транслитерации как на <a href="https://translit.net/" rel="noreferrer">translit.net</a>.
       </p>
     </section>
   )
