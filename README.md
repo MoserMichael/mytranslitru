@@ -4,7 +4,8 @@ Visit my transliteration page [here on github gh-pages](https://mosermichael.git
 
 Runs entirely in the browser. No adds. No evil stuff. Spell checker runs locally.
 
-(well, it's a vibe coding exercise, but it does something :-)
+(well, it's a vibe coding exercise, but it does something)
+(... or: sometimes it is preferable to spend a few thousand tokens, if it can spare you a visit to web pages with adds and other nasty things)
 
 ----
 
