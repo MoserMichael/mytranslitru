@@ -1,61 +1,53 @@
-import { LETTERS, LetterRule, SPECIAL_RULES } from '../translit/rules'
+import { MouseEvent, useState } from 'react'
+import { LETTERS, SPECIAL_RULES } from '../translit/rules'
 
-const COLUMNS = 3
-const perColumn = Math.ceil(LETTERS.length / COLUMNS)
-const columns = Array.from({ length: COLUMNS }, (_, i) => LETTERS.slice(i * perColumn, (i + 1) * perColumn))
-const noted = LETTERS.filter((l) => l.notes)
-const noteNumber = (l: LetterRule) => noted.indexOf(l) + 1
+interface Props {
+  /** Inserts a Cyrillic letter at the editor caret. */
+  onInsert: (letter: string) => void
+}
 
-export function RulesTable() {
+/**
+ * The letter strip in translit.net style: for each letter, the Latin input for
+ * the capital, the Latin input for the small letter, and a button that inserts
+ * the Cyrillic letter (capital with "shift" on or Shift held).
+ */
+export function RulesTable({ onInsert }: Props) {
+  const [shift, setShift] = useState(false)
+
+  // Keep the editor's focus and selection when a button is pressed.
+  const keepFocus = (e: MouseEvent) => e.preventDefault()
+
   return (
-    <details className="rules" open>
-      <summary>Transliteration rules</summary>
-      <div className="rules-columns">
-        {columns.map((col, i) => (
-          <table key={i}>
-            <thead>
-              <tr>
-                <th scope="col">Cyrillic</th>
-                <th scope="col">Romanization</th>
-                <th scope="col">Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {col.map((l) => (
-                <tr key={l.cyrillic}>
-                  <td className="cyr">{l.cyrillic}</td>
-                  <td>
-                    {l.romanization}
-                    {l.notes && <sup>{noteNumber(l)}</sup>}
-                  </td>
-                  <td>
-                    <kbd>{l.input}</kbd>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ))}
-      </div>
-      <ol className="notes">
-        {noted.map((l) => (
-          <li key={l.cyrillic}>
-            <strong>{l.cyrillic}</strong>: {l.notes}
+    <section className="rules" aria-label="Transliteration rules">
+      <ul className="letters">
+        <li className="letter shift-cell">
+          <button className={shift ? 'shift on' : 'shift'} aria-pressed={shift} onMouseDown={keepFocus} onClick={() => setShift((s) => !s)}>
+            shift
+          </button>
+        </li>
+        {LETTERS.map((l) => (
+          <li key={l.lower} className="letter">
+            <span className="latin-upper">{l.latinUpper}</span>
+            <span className="latin-lower">{l.latinLower}</span>
+            <button
+              className="cyr"
+              onMouseDown={keepFocus}
+              onClick={(e) => onInsert(shift !== e.shiftKey ? l.upper : l.lower)}
+              title={`Insert ${l.upper} / ${l.lower}`}
+            >
+              {shift ? l.upper : l.lower}
+            </button>
           </li>
         ))}
-      </ol>
+      </ul>
       <ul className="notes">
         {SPECIAL_RULES.map((r) => (
           <li key={r}>{r}</li>
         ))}
       </ul>
       <p className="source">
-        Romanization follows Wikipedia's{' '}
-        <a href="https://en.wikipedia.org/wiki/Wikipedia:Romanization_of_Russian#Full_rules" rel="noreferrer">
-          Romanization of Russian
-        </a>{' '}
-        full rules.
+        Transliteration rules as on <a href="https://translit.net/" rel="noreferrer">translit.net</a>.
       </p>
-    </details>
+    </section>
   )
 }

@@ -31,7 +31,8 @@ export function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.code === 'Space') {
+      // Esc and F12 as on translit.net; Ctrl+Space as well, since F12 is often taken by dev tools.
+      if (e.key === 'Escape' || e.key === 'F12' || (e.ctrlKey && e.code === 'Space')) {
         e.preventDefault()
         setTranslit((t) => !t)
       }
@@ -45,6 +46,11 @@ export function App() {
     if (!ta || ta.selectionStart === ta.selectionEnd) return
     const { selectionStart: start, selectionEnd: end } = ta
     replaceRange(ta, start, end, transliterate(ta.value.slice(start, end)))
+  }
+
+  const insertLetter = (letter: string) => {
+    const ta = editorRef.current?.textarea
+    if (ta) replaceRange(ta, ta.selectionStart, ta.selectionEnd, letter)
   }
 
   const copy = async () => {
@@ -75,7 +81,7 @@ export function App() {
             className={translit ? 'toggle on' : 'toggle'}
             aria-pressed={translit}
             onClick={() => setTranslit((t) => !t)}
-            title="Ctrl+Space"
+            title="Esc, F12 or Ctrl+Space"
           >
             {translit ? 'Кириллица ON' : 'Latin (translit OFF)'}
           </button>
@@ -86,7 +92,7 @@ export function App() {
         </div>
       </header>
 
-      <RulesTable />
+      <RulesTable onInsert={insertLetter} />
 
       <main>
         <Editor
@@ -101,7 +107,7 @@ export function App() {
         <div className="status" role="status">
           <span className={`spell-${spell.status}`}>{spellStatus}</span>
           <span>
-            {spell.wordCount} word{spell.wordCount === 1 ? '' : 's'} · Ctrl+Space toggles transliteration
+            {spell.wordCount} word{spell.wordCount === 1 ? '' : 's'} · Esc toggles transliteration
           </span>
         </div>
       </main>

@@ -1,6 +1,5 @@
 import { forwardRef, KeyboardEvent, ReactNode, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { applyKey } from '../translit/engine'
-import { SEPARATOR } from '../translit/rules'
 import type { WordRange } from '../spell/useSpellChecker'
 import { SuggestionPopover } from './SuggestionPopover'
 
@@ -46,7 +45,6 @@ export const Editor = forwardRef<EditorHandle, Props>(function Editor(
   // Caret position right after the last transliterated letter; letters only
   // recompose (с + h → ш) when typing continues from exactly there.
   const lastPos = useRef(-1)
-  const blocked = useRef(false)
   const [popover, setPopover] = useState<Popover | null>(null)
 
   useImperativeHandle(ref, () => ({ textarea: taRef.current }))
@@ -54,15 +52,9 @@ export const Editor = forwardRef<EditorHandle, Props>(function Editor(
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (!translit || e.ctrlKey || e.metaKey || e.altKey || e.nativeEvent.isComposing) return
     if (e.key.length !== 1) return
-    if (e.key === SEPARATOR) {
-      e.preventDefault()
-      blocked.current = true
-      return
-    }
     const ta = e.currentTarget
     const { selectionStart: start, selectionEnd: end } = ta
-    const recompose = !blocked.current && start === end && start === lastPos.current
-    blocked.current = false
+    const recompose = start === end && start === lastPos.current
     const r = applyKey(ta.value.slice(0, start), e.key, recompose)
     if (!r) return
     e.preventDefault()

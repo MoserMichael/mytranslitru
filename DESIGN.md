@@ -11,10 +11,10 @@ On a laptop with a Latin-only keyboard there's no easy way to type Cyrillic. Thi
 ## Page layout
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ Header: title · [Translit ON/OFF] (Ctrl+Space) · Copy     │
+│ Header: title · [Translit ON/OFF] (Esc) · Copy            │
 ├──────────────────────────────────────────────────────────┤
-│ UPPER: Transliteration rules table (collapsible)          │
-│  Cyrillic | Latin | Notes/examples   (33 letters + rules) │
+│ UPPER: translit.net-style letter strip                   │
+│  [shift] A/a [а] B/b [б] … Ja/ja,ya,q [я]  + special rules │
 ├──────────────────────────────────────────────────────────┤
 │ LOWER: Multiline editor                                    │
 │  textarea + highlight overlay (red underline on errors)    │
@@ -38,28 +38,27 @@ src/
 ```
 
 ## 1. Rules section (upper)
-Mirrors the Wikipedia "Romanization of Russian, Full rules" table: А–Я with their Latin equivalents (a, b, v, g, d, e/ye, yo, zh, z, i, y, k, l, m, n, o, p, r, s, t, u, f, kh, ts, ch, sh, shch, ʺ, y, ʹ, e, yu, ya), plus the special notes (e → *ye* at the start of a word and after vowels/ъ/ь, the -ий/-ый endings, and so on). The table is generated from `rules.ts`, so what's displayed and what the input engine does can't drift apart. The table is static content bundled with the app, not fetched from Wikipedia.
+Follows the letter strip on https://translit.net/: a "shift" cell, then one cell per letter in alphabetical order (А–Я). Each cell shows the Latin input for the capital letter (bold), the Latin input(s) for the small letter, and a button that inserts the Cyrillic letter at the caret. Shift (the cell or the Shift key) inserts the capital. Below the strip are the special rules (signs, the `+` separator, toggle keys). The strip is generated from `rules.ts`, so what's displayed and what the input engine does can't drift apart.
 
 ## 2. Transliteration engine
-Wikipedia's romanization is lossy in reverse: е and э both map to *e*, й and ы both map to *y*, and ь/ъ are often dropped. So the input engine follows the Wikipedia scheme and adds a few unambiguous keys for those cases. The table marks which keys are input-only.
+Same scheme as translit.net. Every key either inserts a letter directly or, if the text before the caret matches a rule, replaces that text (rules with longer matches are tried first):
 
-**How it works.** The editor intercepts printable keys (`onKeyDown` / `beforeinput`) while translit is ON. Each Latin key either inserts a Cyrillic letter or *recomposes* the letter(s) just before the caret. It follows the same approach as translit.ru-style tools, so no hidden buffer is needed:
+| Typed | Result |
+|---|---|
+| a b v g d e z i j k l m n o p r s t u f h c y | а б в г д е з и й к л м н о п р с т у ф х ц ы |
+| x / w / q / ö / ä / ü | х / щ / я / ё / э / ю |
+| z+h, c+h, s+h | ж, ч, ш |
+| sh+h (shh) | щ |
+| j or y + a / o / u | я / ё / ю |
+| j+e (je) | э |
+| ' / # | ь / ъ; typed twice: Ь / Ъ |
+| tvz / mjz | ъ / ь |
+| `+` | separator: j+o → йо, j+e → йе, s+h → сх |
 
-| Typed | Result | Mechanism |
-|---|---|---|
-| a b v g d e z i k l m n o p r s t u f | а б в г д е з и к л м н о п р с т у ф | direct |
-| y | ы after a consonant, otherwise й | context |
-| z+h, k+h, c+h, s+h | ж, х, ч, ш | recompose previous char |
-| t+s | ц | recompose (т+с → ц) |
-| ш+c+h (shch) | щ | recompose шч → щ |
-| y+a / y+u / y+o / y+e | я / ю / ё / е | recompose й/ы + vowel |
-| e+h (input-only) | э | recompose |
-| ' / " | ь / ъ | direct (Wikipedia's ʹ ʺ) |
-| `` ` `` (backtick, input-only) | separator that blocks the next recomposition, e.g. `t`s` → тс (отсюда) | consumed |
-
-- Capitals are preserved (`Sh` → Ш, `SH` → Ш).
-- Digits, punctuation, Enter, Backspace, paste, and IME input pass through untouched. Pasted Latin text stays Latin; a "Convert selection" button transliterates it explicitly.
-- Ctrl+Space toggles translit off so the user can type Latin words.
+- Capitals: `Sh`/`SH` → Ш, `Ja`/`JA` → Я.
+- Letters only combine while typing continues from the last converted letter. After the caret is moved, the next key is inserted directly.
+- Digits, punctuation, Enter, Backspace, paste and IME input pass through untouched. Pasted Latin text stays Latin; a "Convert selection" button transliterates it.
+- Esc or F12 (as on translit.net), or Ctrl+Space, toggles between Cyrillic and Latin input.
 - The engine is a pure function, which makes it fully unit-testable. Undo works through `document.execCommand('insertText')` / `setRangeText`, so the browser's native undo stack keeps working.
 
 ## 3. Spell checker
@@ -78,8 +77,8 @@ Wikipedia's romanization is lossy in reverse: е and э both map to *e*, й and 
 - **License:** dictionary-ru is LGPL/MPL-style licensed. Credit it in the footer.
 
 ## Verification
-1. `npm test`: unit test cases for the engine (`privet`→привет, `shchi`→щи, `zhuk`→жук, `yabloko`→яблоко, `t`s`→тс, `ehto`→это, `syn`→сын, `moy`→мой, capital letters).
-2. `npm run dev`, then type in the editor: check the conversion, the Ctrl+Space toggle, undo/redo, paste, and the caret position mid-text.
+1. `npm test`: unit test cases for the engine (`privet`→привет, `shhi`→щи, `zhuk`→жук, `jabloko`→яблоко, `s+hema`→схема, `jeto`→это, `ob#javlenie`→объявление, capital letters).
+2. `npm run dev`, then type in the editor: check the conversion, the Esc toggle, the letter buttons, undo/redo, paste, and the caret position mid-text.
 3. Spell check: misspell a word (`превет`) and confirm the underline appears and `привет` is among the suggestions.
 4. DevTools Network tab: after the first load, typing and spell checking trigger zero requests, and there are no third-party domains at all.
 5. `npm run build && npx vite preview`: the production build works.

@@ -1,7 +1,7 @@
 # Russian transliteration
 
 Type Russian on a Latin keyboard: Latin letters are converted to Cyrillic as you type
-(Wikipedia romanization rules), and a Russian spell checker (nspell + dictionary-ru)
+(same rules as translit.net), and a Russian spell checker (nspell + dictionary-ru)
 underlines mistakes. Everything runs in the browser; no requests leave the page.
 
 ```sh
