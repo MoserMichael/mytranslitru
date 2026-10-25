@@ -4,7 +4,7 @@
 On a laptop with a Latin-only keyboard there's no easy way to type Cyrillic. This page lets the user type Russian with the English layout. The text turns into Cyrillic as they type, and a Russian spell checker runs alongside. Everything happens in the browser: once the page loads it makes no requests to other servers, and it shows no ads. The repo (`/mnt/c/Users/michael.moser/mystuff/trn`) is empty, so this is a new project.
 
 ## Tech stack
-- **React 18 + TypeScript + Vite** (static build; the output in `dist/` can be opened from any static host or from a local server)
+- **React 18 + TypeScript + Vite 2.9** (static build; the output in `dist/` can be opened from any static host or from a local server). Node is needed only to build, never to run the page. Vite 2.9 is used because it still supports the Node 12 installed here.
 - **nspell** (Hunspell-compatible spell checking in JS) and **dictionary-ru** (Russian `.aff`/`.dic`)
 - No backend, no analytics, no CDN fonts or scripts. All assets, including the dictionary files, ship from the same origin. A strict CSP `<meta>` (`default-src 'self'`) enforces this.
 
@@ -29,7 +29,7 @@ src/
   main.tsx, App.tsx
   translit/rules.ts        // single source of truth: data for the table AND the input engine
   translit/engine.ts       // pure functions: applyKey(text, caret, key) → {text, caret}
-  translit/engine.test.ts  // Vitest unit tests
+  translit/engine.test.ts  // unit tests (esbuild + node assert; Vitest needs Node 14+)
   components/RulesTable.tsx
   components/Editor.tsx    // textarea + overlay + keyboard interception
   components/SuggestionPopover.tsx
@@ -78,7 +78,7 @@ Wikipedia's romanization is lossy in reverse: е and э both map to *e*, й and 
 - **License:** dictionary-ru is LGPL/MPL-style licensed. Credit it in the footer.
 
 ## Verification
-1. `npm run test`: Vitest cases for the engine (`privet`→привет, `shchi`→щи, `zhuk`→жук, `yabloko`→яблоко, `t`s`→тс, `ehto`→это, `syn`→сын, `moy`→мой, capital letters).
+1. `npm test`: unit test cases for the engine (`privet`→привет, `shchi`→щи, `zhuk`→жук, `yabloko`→яблоко, `t`s`→тс, `ehto`→это, `syn`→сын, `moy`→мой, capital letters).
 2. `npm run dev`, then type in the editor: check the conversion, the Ctrl+Space toggle, undo/redo, paste, and the caret position mid-text.
 3. Spell check: misspell a word (`превет`) and confirm the underline appears and `привет` is among the suggestions.
 4. DevTools Network tab: after the first load, typing and spell checking trigger zero requests, and there are no third-party domains at all.
