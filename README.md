@@ -4,6 +4,8 @@ Visit my transliteration page [here on github gh-pages](https://mosermichael.git
 
 Runs entirely in the browser. No adds. No evil stuff. Spell checker runs locally.
 
+(well, it's a vibe coding exercise, but it does something :-)
+
 ----
 
 Type Russian on a Latin keyboard: Latin letters are converted to Cyrillic as you type
