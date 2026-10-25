@@ -1,5 +1,11 @@
 # Russian transliteration
 
+Visit my transliteration page [here on github gh-pages](https://mosermichael.github.io/mytranslitru/)
+
+Runs entirely in the browser. No adds. No evil stuff. Spell checker runs locally.
+
+----
+
 Type Russian on a Latin keyboard: Latin letters are converted to Cyrillic as you type
 (same rules as translit.net), and a Russian spell checker (nspell + dictionary-ru)
 underlines mistakes. Everything runs in the browser; no requests leave the page.
