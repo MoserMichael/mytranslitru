@@ -1,5 +1,5 @@
 import { MouseEvent, useState } from 'react'
-import { LETTERS, SPECIAL_RULES } from '../translit/rules'
+import { LETTERS } from '../translit/rules'
 
 interface Props {
   /** Inserts a Cyrillic letter at the editor caret. */
@@ -40,14 +40,6 @@ export function RulesTable({ onInsert }: Props) {
           </li>
         ))}
       </ul>
-      <ul className="notes">
-        {SPECIAL_RULES.map((r) => (
-          <li key={r}>{r}</li>
-        ))}
-      </ul>
-      <p className="source">
-        Правила транслитерации как на <a href="https://translit.net/" rel="noreferrer">translit.net</a>.
-      </p>
     </section>
   )
 }

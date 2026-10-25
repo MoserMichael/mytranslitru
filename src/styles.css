@@ -152,19 +152,6 @@ button.toggle.on {
   color: var(--accent-text);
 }
 
-.notes {
-  margin: 10px 0 0;
-  padding-left: 22px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.source {
-  margin: 8px 0 0;
-  font-size: 12px;
-  color: var(--muted);
-}
-
 /* Editor: a transparent textarea over an identically styled overlay that draws the spelling marks */
 
 main {
@@ -277,7 +264,49 @@ main {
   color: var(--error);
 }
 
-footer {
-  font-size: 12px;
-  color: var(--muted);
+/* Help dialog */
+
+dialog.help {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+dialog.help::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.help-body {
+  padding: 16px 20px;
+}
+
+.help h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.help h3 {
+  margin: 14px 0 4px;
+  font-size: 15px;
+}
+
+.help p,
+.help ul {
+  margin: 0;
+  font-size: 14px;
+}
+
+.help ul {
+  padding-left: 20px;
+}
+
+.help-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
 }

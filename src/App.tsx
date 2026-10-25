@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Editor, EditorHandle, replaceRange } from './components/Editor'
+import { HelpDialog } from './components/HelpDialog'
 import { RulesTable } from './components/RulesTable'
 import { transliterate } from './translit/engine'
 import { useSpellChecker } from './spell/useSpellChecker'
@@ -27,6 +28,9 @@ export function App() {
   const [text, setText] = useState(loadText)
   const [translit, setTranslit] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
+  const helpOpenRef = useRef(false)
+  helpOpenRef.current = helpOpen
   const editorRef = useRef<EditorHandle>(null)
   const spell = useSpellChecker(text)
 
@@ -40,6 +44,8 @@ export function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Esc closes the help dialog instead.
+      if (helpOpenRef.current) return
       // Esc and F12 as on translit.net; Ctrl+Space as well, since F12 is often taken by dev tools.
       if (e.key === 'Escape' || e.key === 'F12' || (e.ctrlKey && e.code === 'Space')) {
         e.preventDefault()
@@ -79,7 +85,7 @@ export function App() {
       ? `Проверка орфографии недоступна: ${spell.error}`
       : spell.misspelled.length === 0
       ? 'Орфографических ошибок нет'
-      : `Возможные ошибки: ${spell.misspelled.length}. Нажмите на подчёркнутое слово, чтобы увидеть варианты.`
+      : `Возможные ошибки: ${spell.misspelled.length}`
 
   return (
     <div className="app">
@@ -98,6 +104,9 @@ export function App() {
             Преобразовать выделенное
           </button>
           <button onClick={copy}>{copied ? 'Скопировано' : 'Копировать текст'}</button>
+          <button onClick={() => setHelpOpen(true)} aria-haspopup="dialog">
+            Справка
+          </button>
         </div>
       </header>
 
@@ -116,16 +125,18 @@ export function App() {
         <div className="status" role="status">
           <span className={`spell-${spell.status}`}>{spellStatus}</span>
           <span>
-            {spell.wordCount} {plural(spell.wordCount, ['слово', 'слова', 'слов'])} · Esc — кириллица/латиница
+            {spell.wordCount} {plural(spell.wordCount, ['слово', 'слова', 'слов'])}
           </span>
         </div>
       </main>
 
-      <footer>
-        Страница работает полностью в браузере, данные никуда не передаются. Проверка орфографии:{' '}
-        <a href="https://github.com/wooorm/nspell" rel="noreferrer">nspell</a> со словарём Hunspell{' '}
-        <a href="https://github.com/wooorm/dictionaries/tree/main/dictionaries/ru" rel="noreferrer">dictionary-ru</a>.
-      </footer>
+      <HelpDialog
+        open={helpOpen}
+        onClose={() => {
+          setHelpOpen(false)
+          editorRef.current?.textarea?.focus()
+        }}
+      />
     </div>
   )
 }
